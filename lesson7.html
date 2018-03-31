@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lesson 2 - Getting Started">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tuts+ Canvas Essentials</title>
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 10px;margin: 0;
+      background-color: #F8F7ED;
+    }
+    canvas{
+      border: dotted 1px #423A33;
+      background-color: #FFFFFF;  
+    }
+  </style>
+  <script>
+    window.TP = {};
+
+    TP.init = function() {
+      var self = this;
+
+      this.canvas = document.getElementById('canvas');
+      this.ctx = canvas.getContext('2d');
+      this.width = canvas.width;
+      this.height = canvas.height;
+      this.isPlaying = true;
+      
+      this.backcanvas = document.createElement('canvas');
+      this.backctx = this.backcanvas.getContext('2d');
+      this.backcanvas.width = this.width;
+      this.backcanvas.height = this.height;
+
+      this.loadVideo();
+
+      this.canvas.onclick = function() {
+        self.isPlaying = self.isPlaying ? false: true;
+        if(self.isPlaying) {
+          self.videoElement.play();
+        } else {
+          self.videoElement.pause();
+        }
+      }
+    }
+    TP.loadVideo = function() {
+      var self = this;
+
+      this.videoElement = document.createElement("video");
+      var videoDiv = document.createElement('div');
+      document.body.appendChild(videoDiv);
+
+      videoDiv.appendChild(this.videoElement);
+      videoDiv.setAttribute("style", "display:none;");
+
+      this.videoElement.setAttribute("src", "ripple.mp4");
+      this.videoElement.addEventListener("canplaythrough", function(e) {
+        self.startVideo();
+      });
+    }
+    
+    TP.startVideo = function() {
+      var self = this;
+
+      this.videoElement.play();
+      this.vidWidth = this.videoElement.videoWidth;
+      this.vidHeight = this.videoElement.videoHeight;
+      setInterval(function() {
+        self.renderFrame();
+      }, 33);
+    }
+
+    TP.renderFrame = function() {
+      if(this.isPlaying) {
+        //this.ctx.drawImage(this.videoElement, 10, 10, this.vidWidth , this.vidHeight);
+        this.backctx.drawImage(this.videoElement, 10, 10, this.vidWidth , this.vidHeight);
+        var frameData = this.backctx.getImageData(10, 10, this.vidWidth, this.vidHeight);
+        var data = frameData.data;
+        for(var i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i]
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+        }
+        this.ctx.putImageData(frameData,10,10);
+        
+      }
+      
+    }
+  </script>
+</head>
+<body onload='TP.init();'>
+  <h3>Canvas Essentials - Lesson 7</h3>
+  <canvas id="canvas" width="450" height="600">
+    <p>Your browser does not support this content</p>
+  </canvas>
+</body>
+</html>
