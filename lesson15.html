@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lesson 2 - Getting Started">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tuts+ Canvas Essentials</title>
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 10px;margin: 0;
+      background-color: #F8F7ED;
+    }
+    canvas{
+      border: dotted 1px #423A33;
+      background-color: #FFFFFF;  
+    }
+  </style>
+  <script src="three.min.js"></script>
+  <script>
+    window.TP = {};
+
+    TP.init = function() {
+      var WIDTH = 400,
+          HEIGHT = 300;
+
+      var VIEW_ANGLE = 45,
+          ASPECT = WIDTH / HEIGHT,
+          NEAR = 0.1,
+          FAR = 10000;
+
+      var container = document.getElementById('container');
+
+      this.camera = new THREE.PerspectiveCamera(
+        VIEW_ANGLE, ASPECT, NEAR, FAR
+      )
+      this.scene = new THREE.Scene();
+      this.camera.position.z = 300;
+
+      this.renderer = new THREE.CanvasRenderer();
+      this.renderer.setSize(WIDTH, HEIGHT);
+
+      container.appendChild(this.renderer.domElement);
+
+      this.scene.add(this.camera);
+
+      this.setupLights();
+
+      this.drawObjects();
+
+    }
+
+    TP.setupLights = function() {
+      var pointLight = new THREE.PointLight(0xFFFFFF);
+
+      pointLight.positionx = 10;
+      pointLight.positiony = 50;
+      pointLight.positionz = 130;
+
+      this.scene.add(pointLight);
+
+    }
+
+    TP.drawObjects = function() {
+      var group = new THREE.Object3D();
+      group.position.y = 50;
+      this.scene.add(group);
+
+      var geometry = new THREE.CubeGeometry(50, 50, 50);
+      var material = new THREE.MeshLambertMaterial({color:0x00ff00});
+      var cube = new THREE.Mesh(geometry, material);
+      cube.position.x = -90;
+      //this.scene.add(cube);
+      group.add(cube);
+
+      var sphereMeterial = new THREE.MeshLambertMaterial({
+        color: 0xCC0000
+      })
+
+      var sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(
+          50, 16, 16
+        ), sphereMeterial
+      );
+
+      group.add(sphere)
+
+      this.renderer.render(this.scene, this.camera);
+
+      var self = this;
+
+      setInterval(function() {
+        cube.rotation.x += 0.1;
+        cube.rotation.y += 0.1;
+        group.rotation.y += 0.1;
+        self.renderer.render(self.scene, self.camera);
+      }, 33)
+    }
+    
+  </script>
+</head>
+<body onload='TP.init();'>
+  <h3>Canvas Essentials - Lesson 15</h3>
+  <div id='container'>
+
+  </div>
+</body>
+</html>
