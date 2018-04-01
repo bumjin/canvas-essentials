@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lesson 2 - Getting Started">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tuts+ Canvas Essentials</title>
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 10px;margin: 0;
+      background-color: #F8F7ED;
+    }
+    canvas{
+      border: dotted 1px #423A33;
+      background-color: #FFFFFF;  
+    }
+  </style>
+  <script>
+    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+
+// MIT license
+
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+ 
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+ 
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+
+    window.TP = {};
+
+    TP.init = function() {
+      var self = this;
+      this.canvas = document.getElementById('canvas');
+      this.ctx = canvas.getContext('2d');
+      this.width = canvas.width;
+      this.height = canvas.height;
+
+      this.animId = null;
+      this.shapeList = [];
+
+      canvas.onclick = function(e) {
+        var square = new TP.Square(e.offsetX, e.offsetY, 40, self.ctx);
+        square.render();
+        self.shapeList.push(square);
+      }
+
+      this.animate();
+    }
+
+    TP.animate = function() {
+      var self = this;
+      this.render();
+      this.animId = requestAnimationFrame(function() {
+        self.animate();
+      })
+    }
+
+    TP.play = function() {
+      var self = this;
+      if (!this.animId) {
+        this.animId = requestAnimationFrame(function() {
+          self.animate();
+        })
+      }
+    }
+
+    TP.pause = function() {
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
+
+    TP.render = function() {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      for(index in this.shapeList) {
+        console.log(index)
+        this.shapeList[index].animate();
+      }
+    }
+
+    TP.Square = function(x, y, size, ctx) {
+      this.x = x;
+      this.y = y;
+      this.size = size;
+      this.ctx = ctx;
+      this.color = '#' + Math.floor(
+          Math.random() * 16777215
+      ).toString(16);
+    }
+    TP.Square.prototype.render = function() {
+      this.ctx.beginPath();
+      this.ctx.rect(
+        this.x, this.y, this.size, this.size
+      )
+      this.ctx.closePath();
+      this.ctx.fillStyle= this.color;
+      this.ctx.fill();
+      
+    }
+    TP.Square.prototype.move = function(newX, newY) {
+      this.x = newX;
+      this.y = newY;
+    }
+
+    TP.Square.prototype.animate = function() {
+      this.move(this.x - 1, this.y - 1);
+      this.render();
+    }
+    
+  </script>
+</head>
+<body onload='TP.init();'>
+  <h3>Canvas Essentials - Lesson 11</h3>
+  <button onclick="TP.play();">Play</button>
+  <button onclick="TP.pause();">Pause</button>
+  <canvas id="canvas" width="450" height="300">
+    <p>Your browser does not support this content</p>
+  </canvas>
+</body>
+</html>
